@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
+using CountryApi.Models;
 
-namespace TodoApi.Controllers
+namespace CountryApi.Controllers
 {
     [Route("api/states")]
     [ApiController]
@@ -21,16 +21,14 @@ namespace TodoApi.Controllers
             _context = context;
         }
 
-        // GET: api/TodoItems
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StatesItem>>> GetStates()
         {
             return await _context.StatesItems.ToListAsync();
         }
 
-        // GET: api/TodoItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<StatesItem>> GetTodoItem(long id)
+        public async Task<ActionResult<StatesItem>> GetState(long id)
         {
             var StatesItem = await _context.StatesItems.FindAsync(id);
 
@@ -42,8 +40,7 @@ namespace TodoApi.Controllers
             return StatesItem;
         }
 
-        // PUT: api/TodoItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutStatesItem(long id, StatesItem StatesItem)
         {
@@ -73,19 +70,16 @@ namespace TodoApi.Controllers
             return NoContent();
         }
 
-        // POST: api/TodoItems
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
         public async Task<ActionResult<StatesItem>> PostStatesItem(StatesItem StatesItem)
         {
             _context.StatesItems.Add(StatesItem);
             await _context.SaveChangesAsync();
 
-            //return CreatedAtAction("GetTodoItem", new { id = todoItem.Id }, todoItem);
             return CreatedAtAction(nameof(GetStates), new { id = StatesItem.Id }, StatesItem);
         }
 
-        // DELETE: api/TodoItems/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStatesItem(long id)
         {

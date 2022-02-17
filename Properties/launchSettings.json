@@ -9,11 +9,10 @@
     }
   },
   "profiles": {
-    "TodoApi": {
+    "CountryApi": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "launchUrl": "api/todoitems",
       "applicationUrl": "https://localhost:8080",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

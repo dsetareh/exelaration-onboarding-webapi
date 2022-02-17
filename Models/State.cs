@@ -1,9 +1,11 @@
-namespace TodoApi.Models
+namespace CountryApi.Models
 {
-    public class TodoItem
+    public class StatesItem
     {
         public long Id { get; set; }
         public string? Name { get; set; }
         public string? Code { get; set; }
+
+        public long countryId { get; set; }
     }
 }
