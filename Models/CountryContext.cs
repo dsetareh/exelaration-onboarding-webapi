@@ -11,5 +11,6 @@ namespace CountryApi.Models
         }
 
         public DbSet<CountryItem> Country { get; set; } = null!;
+        public DbSet<StatesItem> StatesItem { get; set; } = null!;
     }
 }
