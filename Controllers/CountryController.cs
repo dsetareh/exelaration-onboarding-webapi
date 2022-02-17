@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CountryApi.Models;
 
+// ToListAsync might be able to be replaced with .Any(),
+// although it's not async (if that matters)
 namespace CountryApi.Controllers
 {
     [Route("api")]
@@ -21,33 +23,43 @@ namespace CountryApi.Controllers
             _context = context;
         }
 
+        // GET: api/countries
+        // list of all countries
         [HttpGet("countries")]
         public async Task<ActionResult<IEnumerable<CountryItem>>> GetCountry()
         {
             return await _context.Country.ToListAsync();
         }
-
+        // GET: api/states
+        // list of all states
         [HttpGet("states")]
         public async Task<ActionResult<IEnumerable<StatesItem>>> GetStates()
         {
             return await _context.StatesItem.ToListAsync();
         }
 
-        [HttpGet("countries/{id}/states")]
-        public async Task<ActionResult<IEnumerable<StatesItem>>> GetCountryStates(long id)
+        // GET: api/countries/<CountryCode>/states
+        // list of all states for a country
+        [HttpGet("countries/{code}/states")]
+        public async Task<ActionResult<IEnumerable<StatesItem>>> GetCountryStates(string code)
         {
             var allStates = await _context.StatesItem.ToListAsync();
+            var allCountries = await _context.Country.ToListAsync();
 
-            var countryStates = allStates.Where(s => s.countryId == id);
+            var country = allCountries.Where(c => c.Code == code).Select(c => c.Id).FirstOrDefault();
+
+            var countryStates = allStates.Where(s => s.countryId == country);
 
             return countryStates.ToList();
 
         }
-
-        [HttpGet("countries/{id}")]
-        public async Task<ActionResult<CountryItem>> GetCountry(long id)
+        // GET: api/countries/<CountryCode>
+        // single country by code
+        [HttpGet("countries/{code}")]
+        public async Task<ActionResult<CountryItem>> GetCountry(string code)
         {
-            var country = await _context.Country.FindAsync(id);
+            var allCountries = await _context.Country.ToListAsync();
+            var country = allCountries.Where(c => c.Code == code).Select(c => c).FirstOrDefault();
 
             if (country == null)
             {
@@ -57,11 +69,12 @@ namespace CountryApi.Controllers
             return country;
         }
 
-
-        [HttpPut("countries/{id}")]
-        public async Task<IActionResult> PutCountry(long id, CountryItem country)
+        // PUT: api/countries/<CountryCode>
+        // update country by code
+        [HttpPut("countries/{code}")]
+        public async Task<IActionResult> PutCountry(string code, CountryItem country)
         {
-            if (id != country.Id)
+            if (code != country.Code)
             {
                 return BadRequest();
             }
@@ -74,7 +87,7 @@ namespace CountryApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CountryExists(id))
+                if (!CountryExists(code))
                 {
                     return NotFound();
                 }
@@ -87,10 +100,13 @@ namespace CountryApi.Controllers
             return NoContent();
         }
 
-        [HttpPut("states/{id}")]
-        public async Task<IActionResult> PutState(long id, StatesItem state)
+        // POST: api/states/<statecode>
+        // update state by code
+        // ! untested, as webui doesn't implement this
+        [HttpPut("states/{code}")]
+        public async Task<IActionResult> PutState(string code, StatesItem state)
         {
-            if (id != state.Id)
+            if (code != state.Code)
             {
                 return BadRequest();
             }
@@ -103,7 +119,7 @@ namespace CountryApi.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CountryExists(id))
+                if (!StateExists(code))
                 {
                     return NotFound();
                 }
@@ -116,6 +132,8 @@ namespace CountryApi.Controllers
             return NoContent();
         }
 
+        // POST: api/countries
+        // add new country
         [HttpPost("countries")]
         public async Task<ActionResult<CountryItem>> PostCountry(CountryItem country)
         {
@@ -125,6 +143,8 @@ namespace CountryApi.Controllers
             return CreatedAtAction(nameof(GetCountry), new { id = country.Id }, country);
         }
 
+        // POST: api/states
+        // add new state
         [HttpPost("states")]
         public async Task<ActionResult<CountryItem>> PostState(StatesItem state)
         {
@@ -134,10 +154,15 @@ namespace CountryApi.Controllers
             return CreatedAtAction(nameof(GetStates), new { id = state.Id }, state);
         }
 
-        [HttpDelete("countries/{id}")]
-        public async Task<IActionResult> DeleteCountry(long id)
+        // DELETE: api/countries/<CountryCode>
+        // delete country by code
+        // ! untested, as webui doesn't implement this
+        [HttpDelete("countries/{code}")]
+        public async Task<IActionResult> DeleteCountry(string code)
         {
-            var country = await _context.Country.FindAsync(id);
+            var allCountries = await _context.Country.ToListAsync();
+            var country = allCountries.Where(c => c.Code == code).Select(c => c).FirstOrDefault();
+
             if (country == null)
             {
                 return NotFound();
@@ -149,10 +174,15 @@ namespace CountryApi.Controllers
             return NoContent();
         }
 
-        [HttpDelete("states/{id}")]
-        public async Task<IActionResult> DeleteState(long id)
+        // DELETE: api/states/<statecode>
+        // delete state by code
+        // ! untested, as webui doesn't implement this
+        [HttpDelete("states/{code}")]
+        public async Task<IActionResult> DeleteState(string code)
         {
-            var state = await _context.StatesItem.FindAsync(id);
+            var allStates = await _context.StatesItem.ToListAsync();
+            var state = allStates.Where(c => c.Code == code).Select(c => c).FirstOrDefault();
+
             if (state == null)
             {
                 return NotFound();
@@ -163,15 +193,15 @@ namespace CountryApi.Controllers
 
             return NoContent();
         }
-
-        private bool CountryExists(long id)
+        // check if country exists by it's countrycode
+        private bool CountryExists(string code)
         {
-            return _context.Country.Any(e => e.Id == id);
+            return _context.Country.Any(e => e.Code == code);
         }
-
-        private bool StateExists(long id)
+        // check if state exists by it's statecode
+        private bool StateExists(string code)
         {
-            return _context.StatesItem.Any(e => e.Id == id);
+            return _context.StatesItem.Any(e => e.Code == code);
         }
     }
 }
