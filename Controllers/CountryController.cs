@@ -34,9 +34,8 @@ namespace CountryApi.Controllers
         [HttpGet("{code}/states")]
         public async Task<ActionResult<IEnumerable<State>>> GetCountryStates(string code)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(c => c.Code == code);
-
-            return await _context.States.Where(s => s.countryId == country.Id).ToListAsync();
+            // return BadRequest(); // no code
+            return await _context.States.Where(s => s.Country.Code == code).ToListAsync();
 
         }
         // GET: api/countries/<CountryCode>
