@@ -24,14 +24,9 @@ namespace CountryApi.Controllers
         // GET: api/states
         // list of all states
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StateDTO>>> GetStates()
+        public async Task<ActionResult<IEnumerable<State>>> GetStates()
         {
-            return await _context.StatesItem.Select(s => new StateDTO(){
-                Code = s.Code,
-                Name = s.Name,
-                Id = s.Id,
-                countryId = s.countryId
-            }).ToListAsync();
+            return await _context.States.ToListAsync();
         }
 
         // POST: api/states
@@ -39,7 +34,7 @@ namespace CountryApi.Controllers
         [HttpPost]
         public async Task<ActionResult<State>> PostState(State state)
         {
-            _context.StatesItem.Add(state);
+            _context.States.Add(state);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetStates), new { id = state.Id }, state);

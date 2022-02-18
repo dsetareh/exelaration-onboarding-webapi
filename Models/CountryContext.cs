@@ -13,12 +13,12 @@ namespace CountryApi.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<State>()
-                .HasOne(s => s.Country)
-                .WithMany(c => c.States)
+                .HasOne<Country>()
+                .WithMany()
                 .HasForeignKey(s => s.countryId);
         }
 
-        public DbSet<Country> Country { get; set; } = null!;
-        public DbSet<State> StatesItem { get; set; } = null!;
+        public DbSet<Country> Countries { get; set; } = null!;
+        public DbSet<State> States { get; set; } = null!;
     }
 }

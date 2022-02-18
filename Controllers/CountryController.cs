@@ -24,42 +24,27 @@ namespace CountryApi.Controllers
         // GET: api/countries
         // list of all countries
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CountryDTO>>> GetAllCountries()
+        public async Task<ActionResult<IEnumerable<Country>>> GetAllCountries()
         {
-            return await _context.Country.Select(c => new CountryDTO(){
-                Code = c.Code,
-                Name = c.Name,
-                Id = c.Id
-            }).ToListAsync();
-                                    
+            return await _context.Countries.ToListAsync();
         }
 
         // GET: api/countries/<CountryCode>/states
         // list of all states for a country
         [HttpGet("{code}/states")]
-        public async Task<ActionResult<IEnumerable<StateDTO>>> GetCountryStates(string code)
+        public async Task<ActionResult<IEnumerable<State>>> GetCountryStates(string code)
         {
-            var countrySelected = await _context.Country.Where(c => c.Code == code).Select(c => c).FirstOrDefaultAsync();
+            var country = await _context.Countries.FirstOrDefaultAsync(c => c.Code == code);
 
-            var countrysStates = from s in countrySelected.States
-                                    select new StateDTO(){
-                                        Code = s.Code,
-                                        Name = s.Name,
-                                        Id = s.Id
-                                    };
-            return countrysStates.ToList();
+            return await _context.States.Where(s => s.countryId == country.Id).ToListAsync();
 
         }
         // GET: api/countries/<CountryCode>
         // single country by code
         [HttpGet("{code}")]
-        public async Task<ActionResult<CountryDTO>> GetCountry(string code)
+        public async Task<ActionResult<Country>> GetCountry(string code)
         {
-            var country = await _context.Country.Where(c => c.Code == code).Select(c => new CountryDTO(){
-                Code = c.Code,
-                Name = c.Name,
-                Id = c.Id
-            }).FirstOrDefaultAsync();
+            var country = await _context.Countries.FirstOrDefaultAsync(c => c.Code == code);
 
             if (country == null)
             {
@@ -74,10 +59,12 @@ namespace CountryApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Country>> PostCountry(Country country)
         {
-            _context.Country.Add(country);
+
+            _context.Countries.Add(country);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetCountry), new { id = country.Id }, country);
+
+            return CreatedAtAction(nameof(GetCountry), new { code = country.Code }, country);
         }
     }
 }

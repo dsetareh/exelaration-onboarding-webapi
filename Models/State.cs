@@ -7,7 +7,5 @@ namespace CountryApi.Models
         public string? Code { get; set; }
 
         public long countryId { get; set; }
-
-        public Country? Country { get; set; }
     }
 }
