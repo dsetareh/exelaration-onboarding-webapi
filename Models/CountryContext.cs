@@ -10,7 +10,15 @@ namespace CountryApi.Models
         {
         }
 
-        public DbSet<CountryItem> Country { get; set; } = null!;
-        public DbSet<StatesItem> StatesItem { get; set; } = null!;
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<State>()
+                .HasOne(s => s.Country)
+                .WithMany(c => c.States)
+                .HasForeignKey(s => s.countryId);
+        }
+
+        public DbSet<Country> Country { get; set; } = null!;
+        public DbSet<State> StatesItem { get; set; } = null!;
     }
 }

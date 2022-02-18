@@ -26,14 +26,14 @@ namespace CountryApi.Controllers
         // GET: api/countries
         // list of all countries
         [HttpGet("countries")]
-        public async Task<ActionResult<IEnumerable<CountryItem>>> GetCountry()
+        public async Task<ActionResult<IEnumerable<Country>>> GetCountry()
         {
             return await _context.Country.ToListAsync();
         }
         // GET: api/states
         // list of all states
         [HttpGet("states")]
-        public async Task<ActionResult<IEnumerable<StatesItem>>> GetStates()
+        public async Task<ActionResult<IEnumerable<State>>> GetStates()
         {
             return await _context.StatesItem.ToListAsync();
         }
@@ -41,7 +41,7 @@ namespace CountryApi.Controllers
         // GET: api/countries/<CountryCode>/states
         // list of all states for a country
         [HttpGet("countries/{code}/states")]
-        public async Task<ActionResult<IEnumerable<StatesItem>>> GetCountryStates(string code)
+        public async Task<ActionResult<IEnumerable<State>>> GetCountryStates(string code)
         {
             var allStates = await _context.StatesItem.ToListAsync();
             var allCountries = await _context.Country.ToListAsync();
@@ -56,7 +56,7 @@ namespace CountryApi.Controllers
         // GET: api/countries/<CountryCode>
         // single country by code
         [HttpGet("countries/{code}")]
-        public async Task<ActionResult<CountryItem>> GetCountry(string code)
+        public async Task<ActionResult<Country>> GetCountry(string code)
         {
             var allCountries = await _context.Country.ToListAsync();
             var country = allCountries.Where(c => c.Code == code).Select(c => c).FirstOrDefault();
@@ -72,7 +72,7 @@ namespace CountryApi.Controllers
         // PUT: api/countries/<CountryCode>
         // update country by code
         [HttpPut("countries/{code}")]
-        public async Task<IActionResult> PutCountry(string code, CountryItem country)
+        public async Task<IActionResult> PutCountry(string code, Country country)
         {
             if (code != country.Code)
             {
@@ -104,7 +104,7 @@ namespace CountryApi.Controllers
         // update state by code
         // ! untested, as webui doesn't implement this
         [HttpPut("states/{code}")]
-        public async Task<IActionResult> PutState(string code, StatesItem state)
+        public async Task<IActionResult> PutState(string code, State state)
         {
             if (code != state.Code)
             {
@@ -135,7 +135,7 @@ namespace CountryApi.Controllers
         // POST: api/countries
         // add new country
         [HttpPost("countries")]
-        public async Task<ActionResult<CountryItem>> PostCountry(CountryItem country)
+        public async Task<ActionResult<Country>> PostCountry(Country country)
         {
             _context.Country.Add(country);
             await _context.SaveChangesAsync();
@@ -146,7 +146,7 @@ namespace CountryApi.Controllers
         // POST: api/states
         // add new state
         [HttpPost("states")]
-        public async Task<ActionResult<CountryItem>> PostState(StatesItem state)
+        public async Task<ActionResult<Country>> PostState(State state)
         {
             _context.StatesItem.Add(state);
             await _context.SaveChangesAsync();

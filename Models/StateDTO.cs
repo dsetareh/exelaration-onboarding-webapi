@@ -1,6 +1,6 @@
 namespace CountryApi.Models
 {
-    public class State
+    public class StateDTO
     {
         public long Id { get; set; }
         public string? Name { get; set; }
@@ -8,6 +8,5 @@ namespace CountryApi.Models
 
         public long countryId { get; set; }
 
-        public Country? Country { get; set; }
     }
 }
