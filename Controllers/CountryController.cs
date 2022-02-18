@@ -26,12 +26,13 @@ namespace CountryApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryDTO>>> GetAllCountries()
         {
-            return await _context.Country.Select(c => new CountryDTO(){
+            return await _context.Countries.Select(c => new CountryDTO()
+            {
                 Code = c.Code,
                 Name = c.Name,
                 Id = c.Id
             }).ToListAsync();
-                                    
+
         }
 
         // GET: api/countries/<CountryCode>/states
@@ -39,15 +40,17 @@ namespace CountryApi.Controllers
         [HttpGet("{code}/states")]
         public async Task<ActionResult<IEnumerable<StateDTO>>> GetCountryStates(string code)
         {
-            var countrySelected = await _context.Country.Where(c => c.Code == code).Select(c => c).FirstOrDefaultAsync();
+            var query = from s in _context.States
+                        join c in _context.Countries on s.CountryId equals c.Id
+                        where c.Code == code
+                        select new StateDTO()
+                        {
+                            Code = s.Code,
+                            Name = s.Name,
+                            Id = s.Id
+                        };
 
-            var countrysStates = from s in countrySelected.States
-                                    select new StateDTO(){
-                                        Code = s.Code,
-                                        Name = s.Name,
-                                        Id = s.Id
-                                    };
-            return countrysStates.ToList();
+            return await query.ToListAsync();
 
         }
         // GET: api/countries/<CountryCode>
@@ -55,7 +58,8 @@ namespace CountryApi.Controllers
         [HttpGet("{code}")]
         public async Task<ActionResult<CountryDTO>> GetCountry(string code)
         {
-            var country = await _context.Country.Where(c => c.Code == code).Select(c => new CountryDTO(){
+            var country = await _context.Countries.Where(c => c.Code == code).Select(c => new CountryDTO()
+            {
                 Code = c.Code,
                 Name = c.Name,
                 Id = c.Id
@@ -72,12 +76,23 @@ namespace CountryApi.Controllers
         // POST: api/countries
         // add new country
         [HttpPost]
-        public async Task<ActionResult<Country>> PostCountry(Country country)
+        public async Task<ActionResult<CountryDTO>> PostCountry(CountryDTO _CountryDTO)
         {
-            _context.Country.Add(country);
+            _context.Countries.Add(new Country()
+            {
+                Code = _CountryDTO.Code,
+                Name = _CountryDTO.Name
+            });
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetCountry), new { id = country.Id }, country);
+            var _ReturnCountry = _context.Countries.Where(c => c.Code == _CountryDTO.Code).Select(c => new CountryDTO()
+            {
+                Code = c.Code,
+                Name = c.Name,
+                Id = c.Id
+            }).FirstOrDefault();
+
+            return CreatedAtAction(nameof(GetCountry), new { code = _CountryDTO.Code }, _ReturnCountry);
         }
     }
 }

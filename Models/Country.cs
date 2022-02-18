@@ -6,6 +6,6 @@ namespace CountryApi.Models
         public string? Name { get; set; }
         public string? Code { get; set; }
 
-        public ICollection<State> States { get; set; } = null!;
+        public List<State> States { get; set; } 
     }
 }

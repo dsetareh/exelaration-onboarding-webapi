@@ -26,23 +26,34 @@ namespace CountryApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StateDTO>>> GetStates()
         {
-            return await _context.StatesItem.Select(s => new StateDTO(){
+            return await _context.States.Select(s => new StateDTO()
+            {
                 Code = s.Code,
                 Name = s.Name,
-                Id = s.Id,
-                countryId = s.countryId
+                Id = s.Id
             }).ToListAsync();
         }
 
         // POST: api/states
         // add new state
         [HttpPost]
-        public async Task<ActionResult<State>> PostState(State state)
+        public async Task<ActionResult<StateDTO>> PostState(StateDTO _StateDTO)
         {
-            _context.StatesItem.Add(state);
+            _context.States.Add(new State(){
+                Code = _StateDTO.Code,
+                Name = _StateDTO.Name,
+                CountryId = _StateDTO.CountryId
+            });
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetStates), new { id = state.Id }, state);
+            var _ReturnState = _context.States.Where(s => s.Code == _StateDTO.Code).Select(s => new StateDTO()
+            {
+                Code = s.Code,
+                Name = s.Name,
+                Id = s.Id
+            }).FirstOrDefault();
+
+            return CreatedAtAction(nameof(GetStates), new { code = _StateDTO.Code }, _ReturnState);
         }
 
     }
