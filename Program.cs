@@ -19,12 +19,15 @@ if (builder.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseHttpsRedirection();
 
+// HTTPS
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
 
+
+// CORS access headers
 app.UseCors(builder =>
 {
     builder.AllowAnyOrigin();

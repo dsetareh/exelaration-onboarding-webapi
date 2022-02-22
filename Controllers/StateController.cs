@@ -30,7 +30,8 @@ namespace CountryApi.Controllers
             {
                 Code = s.Code,
                 Name = s.Name,
-                Id = s.Id
+                Id = s.Id,
+                CountryId = s.CountryId
             }).ToListAsync();
         }
 
@@ -39,7 +40,27 @@ namespace CountryApi.Controllers
         [HttpPost]
         public async Task<ActionResult<StateDTO>> PostState(StateDTO _StateDTO)
         {
-            _context.States.Add(new State(){
+            // no null state codes or names
+            if (String.IsNullOrEmpty(_StateDTO.Code) || String.IsNullOrEmpty(_StateDTO.Name))
+            {
+                return BadRequest("State code and name are required");
+            }
+
+            // no duplicate state codes
+            if (await _context.States.AnyAsync(s => s.Code == _StateDTO.Code))
+            {
+                return BadRequest("State code must be unique");
+            }
+
+            // CountryId must be a valid Country Id
+            if (!await _context.Countries.AnyAsync(c => c.Id == _StateDTO.CountryId))
+            {
+                return BadRequest("Invalid Country Id");
+            }
+
+
+
+            await _context.States.AddAsync(new State(){
                 Code = _StateDTO.Code,
                 Name = _StateDTO.Name,
                 CountryId = _StateDTO.CountryId
