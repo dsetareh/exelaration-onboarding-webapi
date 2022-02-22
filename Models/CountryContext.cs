@@ -10,7 +10,7 @@ namespace CountryApi.Models
         {
         }
 
-        public DbSet<Country> Countries { get; set; } = null!;
-        public DbSet<State> States { get; set; } = null!;
+        public DbSet<CountryItem> Country { get; set; } = null!;
+        public DbSet<StatesItem> StatesItem { get; set; } = null!;
     }
 }

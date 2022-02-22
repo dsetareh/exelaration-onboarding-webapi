@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddDbContext<CountryContext>(opt =>
     opt.UseInMemoryDatabase("CountryList"));
+builder.Services.AddDbContext<CountryContext>(opt =>
+    opt.UseInMemoryDatabase("StatesList"));
 
 
 var app = builder.Build();
