@@ -40,14 +40,20 @@ namespace CountryApi.Controllers
         [HttpGet("{code}/states")]
         public async Task<ActionResult<IEnumerable<StateDTO>>> GetCountryStates(string code)
         {
+            // country.code cannot include a number
+            if (code.Any(char.IsDigit))
+            {
+                return BadRequest("Country code cannot include a number");
+            }
+
             var query = from s in _context.States
-                        join c in _context.Countries on s.CountryId equals c.Id
-                        where c.Code == code
+                        where s.Country.Code == code
                         select new StateDTO()
                         {
                             Code = s.Code,
                             Name = s.Name,
-                            Id = s.Id
+                            Id = s.Id,
+                            CountryId = s.CountryId
                         };
 
             return await query.ToListAsync();
@@ -58,6 +64,12 @@ namespace CountryApi.Controllers
         [HttpGet("{code}")]
         public async Task<ActionResult<CountryDTO>> GetCountry(string code)
         {
+            // country.code cannot include a number
+            if (code.Any(char.IsDigit))
+            {
+                return BadRequest("Country code cannot include a number");
+            }
+
             var country = await _context.Countries.Where(c => c.Code == code).Select(c => new CountryDTO()
             {
                 Code = c.Code,
@@ -77,8 +89,27 @@ namespace CountryApi.Controllers
         // add new country
         [HttpPost]
         public async Task<ActionResult<CountryDTO>> PostCountry(CountryDTO _CountryDTO)
-        {
-            _context.Countries.Add(new Country()
+        {            
+            // country code/name cannot be null
+            if (string.IsNullOrEmpty(_CountryDTO.Code) || string.IsNullOrEmpty(_CountryDTO.Name))
+            {
+                return BadRequest("Country code or name cannot be null");
+            }
+
+            // country code/name cannot include a number
+            if (_CountryDTO.Code.Any(char.IsDigit) || _CountryDTO.Name.Any(char.IsDigit))
+            {
+                return BadRequest("Country code or name cannot include a number");
+            }
+
+            // lets not accept duplicate countries
+            if (await _context.Countries.AnyAsync(c => c.Code == _CountryDTO.Code))
+            {
+                return BadRequest("Country already exists");
+            }
+
+
+            await _context.Countries.AddAsync(new Country()
             {
                 Code = _CountryDTO.Code,
                 Name = _CountryDTO.Name
