@@ -24,6 +24,9 @@ if (builder.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 
+// serve frontend as well (./wwwroot)
+app.UseFileServer();
+
 app.MapControllers();
 
 
